@@ -1,7 +1,7 @@
 #include "Arguments.h"
 
+#define RELAX_GEOMETRIC_VISIBILITY_TEST "relax_geometric_visibility_test"
 #define SKIP_GLOBAL_SEAM_LEVELING "skip_global_seam_leveling"
-#define SKIP_GEOMETRIC_VISIBILITY_TEST "skip_geometric_visibility_test"
 #define SKIP_LOCAL_SEAM_LEVELING "skip_local_seam_leveling"
 
 Arguments parse_args(int argc, char **argv) {
@@ -9,7 +9,7 @@ Arguments parse_args(int argc, char **argv) {
     args.set_exit_on_error(true);
     args.set_nonopt_maxnum(3);
     args.set_nonopt_minnum(3);
-    args.set_helptext_indent(34);
+    args.set_helptext_indent(35);
     args.set_description("Textures a mesh given images in form of a 3D scene.");
     args.set_usage("Usage: " + std::string(argv[0]) + " [options] IN_SCENE IN_MESH OUT_MESH_PREFIX"
         "\n\nIN_SCENE := (SCENE_FOLDER | BUNDLE_FILE | MVE_SCENE::EMBEDDING)"
@@ -48,8 +48,8 @@ Arguments parse_args(int argc, char **argv) {
         "Photometric outlier (pedestrians etc.) removal method: {none, gauss_clamping, gauss_damping} [none]");
     args.add_option('v',"view_selection_model", false,
         "Write out view selection model [false]");
-    args.add_option('\0', SKIP_GEOMETRIC_VISIBILITY_TEST, false,
-        "Skip geometric visibility test based on ray intersection [false]");
+    args.add_option('\0', RELAX_GEOMETRIC_VISIBILITY_TEST, false,
+        "Relax geometric visibility test based on ray intersection (not all three face vertices must be visible) [false]");
     args.add_option('\0', SKIP_GLOBAL_SEAM_LEVELING, false,
         "Skip global seam leveling [false]");
     args.add_option('\0', SKIP_LOCAL_SEAM_LEVELING, false,
@@ -70,7 +70,7 @@ Arguments parse_args(int argc, char **argv) {
     conf.write_view_selection_model = false;
     conf.write_data_term_histograms = false;
     conf.write_mrf_energies = false;
-    conf.geometric_visibility_test = true;
+    conf.strict_geometric_visibility_test = true;
     conf.global_seam_leveling = true;
     conf.local_seam_leveling = true;
 
@@ -97,8 +97,8 @@ Arguments parse_args(int argc, char **argv) {
             conf.outlier_removal = parse_outlier_removal(i->arg);
         break;
         case '\0':
-            if (i->opt->lopt == SKIP_GEOMETRIC_VISIBILITY_TEST) {
-                conf.geometric_visibility_test = false;
+            if (i->opt->lopt == RELAX_GEOMETRIC_VISIBILITY_TEST) {
+                conf.strict_geometric_visibility_test = false;
             } else if (i->opt->lopt == SKIP_GLOBAL_SEAM_LEVELING) {
                 conf.global_seam_leveling = false;
             } else if (i->opt->lopt == SKIP_LOCAL_SEAM_LEVELING) {
